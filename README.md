@@ -16,7 +16,7 @@ Organização dos trabalhos em repositórios do GitHub.
 Diagrama de casos de uso;
 Ferramentas para criação de diagramas;
 Introdução à linguagem PlantUML para geração de diagramas;
-Exercício 1;
+Exercício 1, 2 e 3;
 Descrição de casos de uso.
 
 ### Semana 3 — Modelagem UML ###
