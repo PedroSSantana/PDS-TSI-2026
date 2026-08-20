@@ -1,0 +1,33 @@
+@startuml
+
+left to right direction
+
+actor "Membro" as Membro
+actor "Instrutor" as Instrutor
+actor "Gerente" as Gerente
+
+rectangle "Sistema da Academia" {
+
+    usecase "Fazer check-in" as UC1
+    usecase "Visualizar ficha de treino" as UC2
+    usecase "Inscrever-se em aula" as UC3
+
+    usecase "Montar ficha de treino" as UC4
+    usecase "Atualizar ficha de treino" as UC5
+
+    usecase "Registrar frequência" as UC6
+    usecase "Gerar relatório de frequência" as UC7
+}
+
+Membro --> UC1
+Membro --> UC2
+Membro --> UC3
+
+Instrutor --> UC4
+Instrutor --> UC5
+
+Gerente --> UC7
+
+UC3 --> UC6 : <<include>>
+
+@enduml
