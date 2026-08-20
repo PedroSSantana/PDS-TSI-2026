@@ -1,0 +1,30 @@
+@startuml
+
+left to right direction
+
+actor "Cliente" as Cliente
+actor "Funcionário" as Funcionario
+actor "Sistema de Pagamento" as Pagamento
+
+rectangle "Sistema do Cinema" {
+
+    usecase "Consultar filmes em cartaz" as UC1
+    usecase "Consultar horários das sessões" as UC2
+    usecase "Comprar ingresso" as UC3
+    usecase "Realizar pagamento" as UC4
+    usecase "Gerar QR Code" as UC5
+    usecase "Validar ingresso" as UC6
+}
+
+Cliente --> UC1
+Cliente --> UC2
+Cliente --> UC3
+
+UC3 --> UC4 : <<include>>
+UC3 --> UC5 : <<include>>
+
+Pagamento --> UC4
+
+Funcionario --> UC6
+
+@enduml
