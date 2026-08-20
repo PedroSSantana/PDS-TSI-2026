@@ -10,9 +10,9 @@ rectangle "Sistema da Biblioteca" {
     usecase "Pesquisar livros" as UC1
     usecase "Verificar disponibilidade" as UC2
     usecase "Reservar livro" as UC3
-
     usecase "Registrar empréstimo" as UC4
     usecase "Registrar devolução" as UC5
+
 }
 
 Aluno --> UC1
