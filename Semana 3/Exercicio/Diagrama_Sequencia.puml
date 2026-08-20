@@ -1,0 +1,26 @@
+@startuml
+
+actor "Estudante" as Estudante
+
+participant ":TelaDeReserva" as TelaDeReserva
+participant ":ControladorDeReserva" as ControladorDeReserva
+participant ":Livro" as Livro
+participant ":CadastroDeEstudante" as CadastroDeEstudante
+
+Estudante -> TelaDeReserva: reservar()
+
+TelaDeReserva -> ControladorDeReserva: solicitarReserva(livro)
+
+ControladorDeReserva -> Livro: verificarDisponibilidade()
+Livro --> ControladorDeReserva: disponível: true
+
+ControladorDeReserva -> CadastroDeEstudante: verificarPendencias(Estudante)
+CadastroDeEstudante --> ControladorDeReserva: semPendencias: true
+
+ControladorDeReserva -> ControladorDeReserva: registrarReserva()
+ControladorDeReserva -> ControladorDeReserva: atualizarStatus()
+
+ControladorDeReserva --> TelaDeReserva: reserva realizada com sucesso
+TelaDeReserva --> Estudante: exibir mensagem de sucesso
+
+@enduml
