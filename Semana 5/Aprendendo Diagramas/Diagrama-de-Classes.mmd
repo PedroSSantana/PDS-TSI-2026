@@ -1,0 +1,122 @@
+classDiagram
+
+    class Banco {
+        -String nome
+        -String codigo
+        +abrirConta(cliente: Cliente, tipo: TipoConta) Conta
+        +encerrarConta(conta: Conta) void
+    }
+
+    class Funcionario {
+        -String matricula
+        -String nome
+        -String cargo
+        +cadastrarCliente(cliente: Cliente) void
+        +alterarCadastro(cliente: Cliente) void
+        +abrirConta(cliente: Cliente, tipo: TipoConta) Conta
+        +encerrarConta(conta: Conta) void
+    }
+
+    class Cliente {
+        -String cpf
+        -String nome
+        -String endereco
+        -String telefone
+        -String email
+        +solicitarAberturaConta() void
+        +solicitarEncerramentoConta() void
+    }
+
+    class Conta {
+        <<abstract>>
+        -String numero
+        -double saldo
+        -Date dataAbertura
+        -Date dataEncerramento
+        -StatusConta status
+        +depositar(valor: double) void
+        +sacar(valor: double) boolean
+        +consultarSaldo() double
+        +encerrar() void
+    }
+
+    class ContaComum {
+        +podeSacar(valor: double) boolean
+    }
+
+    class ContaEspecial {
+        -double limite
+        +podeSacar(valor: double) boolean
+        +consultarLimite() double
+    }
+
+    class ContaPoupanca {
+        -double taxaJuros
+        +calcularJuros() double
+        +aplicarJuros() void
+    }
+
+    class CaixaEletronico {
+        -String numero
+        -String localizacao
+        +depositar(conta: Conta, valor: double) void
+        +sacar(conta: Conta, valor: double) void
+        +consultarSaldo(conta: Conta) double
+        +emitirExtrato(conta: Conta) Extrato
+    }
+
+    class Movimentacao {
+        -Date dataHora
+        -double valor
+        -TipoMovimentacao tipo
+        -String descricao
+    }
+
+    class Extrato {
+        -Date dataInicio
+        -Date dataFim
+        +gerar() String
+    }
+
+    class TipoConta {
+        <<enumeration>>
+        COMUM
+        ESPECIAL
+        POUPANCA
+    }
+
+    class TipoMovimentacao {
+        <<enumeration>>
+        DEPOSITO
+        SAQUE
+        JUROS
+    }
+
+    class StatusConta {
+        <<enumeration>>
+        ATIVA
+        ENCERRADA
+    }
+
+
+    Banco "1" o-- "0..*" Conta : possui
+    Banco "1" o-- "0..*" Funcionario : possui
+
+    Funcionario "1" --> "0..*" Cliente : cadastra
+    Funcionario "1" --> "0..*" Conta : gerencia
+
+    Cliente "1" --> "0..*" Conta : possui
+
+    Conta <|-- ContaComum
+    Conta <|-- ContaEspecial
+    Conta <|-- ContaPoupanca
+
+    CaixaEletronico "1" ..> "0..*" Conta : realiza operacoes
+
+    Conta "1" *-- "0..*" Movimentacao : registra
+
+    CaixaEletronico "1" ..> "0..*" Extrato : emite
+
+    Conta ..> TipoConta : utiliza
+    Conta ..> StatusConta : possui
+    Movimentacao ..> TipoMovimentacao : possui

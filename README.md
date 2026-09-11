@@ -6,20 +6,31 @@ AULAS E EXERCICIOS - PDS-TSI/2026
 ## Aulas
 
 ### Semana 1 — Introdução ao Projeto de Software ###
-Apresentação da disciplina, metodologia de trabalho e critérios de avaliação;
-Avaliações individuais — Semana 9 e Semana 14;
-Entendendo a importância de projetar um software;
-Definição do problema para o projeto de aplicativo;
+Apresentação da disciplina, metodologia de trabalho e critérios de avaliação;  
+Avaliações individuais — Semana 9 e Semana 14;  
+Entendendo a importância de projetar um software;  
+Definição do problema para o projeto de aplicativo;  
 Organização dos trabalhos em repositórios do GitHub.
 
 ### Semana 2 — Casos de Uso ###
-Diagrama de casos de uso;
-Ferramentas para criação de diagramas;
-Introdução à linguagem PlantUML para geração de diagramas;
-Exercício 1, 2 e 3;
+Diagrama de casos de uso;  
+Ferramentas para criação de diagramas;  
+Introdução à linguagem PlantUML para geração de diagramas;  
+Exercício 1, 2 e 3;  
 Descrição de casos de uso.
 
 ### Semana 3 — Modelagem UML ###
-Descrição textual de casos de uso;
-Diagrama de sequência;
+Descrição textual de casos de uso;  
+Diagrama de sequência;  
 Formatação de diagramas UML utilizando Mermaid.
+
+### Semana 5 — Diagrama de Classes ###
+Introdução ao diagrama de classes e sua importância na UML;  
+Representação de classes, atributos e métodos;  
+Visibilidade de atributos e métodos: privado, protegido e público;  
+Relacionamentos ou associações entre classes;  
+Tipos de associação: unária, binária e ternária/n-ária;  
+Multiplicidade nas associações;  
+Agregação e composição;  
+Generalização/especialização e conceito de herança e polimorfismo;  
+Exercícios de elaboração de diagramas de classes.  
