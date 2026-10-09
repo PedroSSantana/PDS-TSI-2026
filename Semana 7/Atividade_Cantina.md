@@ -16,15 +16,15 @@
 - Atualizar estoque
 - Consultar vendas
 
-## 2. Diagrama de Casos de Uso
+## 2. Tarefa 01 - Diagrama de Casos de Uso
 
-![Diagrama de Casos de Uso](imagens/casos-de-uso.png)
+![Diagrama de Casos de Uso](imagens/Casos_de_Uso.png)
 
-## 3. Diagrama de Classes
+## 3. Tarefa 02 - Diagrama de Classes
 
 ![Diagrama de Classes](imagens/diagrama-classes.png)
 
-## 4. Implementação em Java
+## 4. Tarefa 03 - Implementação em Java
 
 O sistema foi implementado em Java, utilizando as classes
 Produto, ItemPedido, Pedido e Pagamento.
