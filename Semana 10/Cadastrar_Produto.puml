@@ -1,0 +1,22 @@
+@startuml
+skinparam object {
+    BackgroundColor White
+    BorderColor #8B4513
+    ArrowColor #A0522D
+}
+
+' Objetos
+object "<u>:Gerente</u>" as gerente
+object "<u>:TelaGerente</u>" as tela
+object "<u>:ControladorProduto</u>" as controle
+object "<u>:Produto</u>" as produto
+
+' Links e mensagens
+gerente -right-> tela : 1: solicitarCadastro(dadosProduto) >
+tela -down-> controle : 1.1: cadastrarProduto(dadosProduto) >
+controle -left-> gerente : 1.1.1: cadastrarProduto(produto) >
+gerente -down-> produto : 1.1.2: criarProduto(dadosProduto) >
+produto -up-> tela : 1.1.3: cadastroConcluido() >
+tela -left-> gerente : 1.2: exibirConfirmacao() >
+
+@enduml
