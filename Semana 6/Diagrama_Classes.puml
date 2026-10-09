@@ -1,0 +1,70 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class Cliente {
+    -id: int
+    -nome: String
+    -cpf: String
+    -email: String
+    +consultarSaldo(): double
+    +realizarPix(chave: String, valor: double): Transacao
+    +cadastrarChavePix(tipo: TipoChavePix, valor: String): ChavePix
+}
+
+class Conta {
+    -numero: String
+    -agencia: String
+    -saldo: double
+    -status: String
+    +verificarSaldo(valor: double): boolean
+    +debitar(valor: double): void
+    +creditar(valor: double): void
+    +registrarTransacao(transacao: Transacao): void
+}
+
+class Transacao {
+    -id: int
+    -valor: double
+    -data: Date
+    -tipo: TipoTransacao
+    -status: String
+    +validar(): boolean
+    +confirmar(): void
+    +cancelar(): void
+}
+
+class ChavePix {
+    -id: int
+    -tipo: TipoChavePix
+    -valor: String
+    -dataCadastro: Date
+    -status: StatusChavePix
+    +ativar(): void
+    +desativar(): void
+    +validar(): boolean
+}
+
+enum TipoChavePix {
+    CPF
+    CNPJ
+    EMAIL
+    TELEFONE
+    ALEATORIA
+}
+
+enum StatusChavePix {
+    ATIVA
+    INATIVA
+}
+
+enum TipoTransacao {
+    PIX_ENVIADO
+    PIX_RECEBIDO
+}
+
+Cliente "1" -- "1..*" Conta : possui
+Cliente "1" -- "0..*" ChavePix : cadastra
+Conta "1" *-- "0..*" Transacao : registra
+
+@enduml
