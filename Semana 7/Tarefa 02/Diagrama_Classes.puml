@@ -1,0 +1,75 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class Produto {
+    -codigo: int
+    -nome: String
+    -categoria: String
+    -preco: BigDecimal
+    -estoque: int
+    -ativo: boolean
+    +getPreco(): BigDecimal
+    +atualizarPreco(preco: BigDecimal): void
+    +atualizarEstoque(quantidade: int): void
+    +temEstoque(quantidade: int): boolean
+    +vender(quantidade: int): void
+    +desativar(): void
+}
+
+class ItemPedido {
+    -produto: Produto
+    -quantidade: int
+    +calcularSubtotal(): BigDecimal
+    +getProduto(): Produto
+    +getQuantidade(): int
+}
+
+class Pedido {
+    -itens: List<ItemPedido>
+    -dataHora: LocalDateTime
+    -finalizado: boolean
+    +adicionarItem(produto: Produto, quantidade: int): void
+    +calcularTotal(): BigDecimal
+    +finalizar(pagamento: Pagamento): boolean
+    +gerarComprovante(): String
+}
+
+class Pagamento {
+    -tipo: TipoPagamento
+    -valorPago: BigDecimal
+    +validarPagamento(total: BigDecimal): boolean
+    +calcularTroco(total: BigDecimal): BigDecimal
+}
+
+enum TipoPagamento {
+    DINHEIRO
+    PIX
+    CREDITO
+    DEBITO
+}
+
+class Atendente {
+    -id: int
+    -nome: String
+    +registrarVenda(pedido: Pedido): void
+    +receberPagamento(pagamento: Pagamento): void
+}
+
+class Gerente {
+    -id: int
+    -nome: String
+    +cadastrarProduto(produto: Produto): void
+    +alterarPreco(produto: Produto, preco: BigDecimal): void
+    +atualizarEstoque(produto: Produto, quantidade: int): void
+    +removerProduto(produto: Produto): void
+}
+
+Pedido "1" *-- "1..*" ItemPedido : contém
+ItemPedido "*" --> "1" Produto : referencia
+Pedido "1" --> "0..1" Pagamento : recebe
+Pagamento --> TipoPagamento : tipo
+Atendente --> Pedido : registra
+Gerente --> Produto : gerencia
+
+@enduml

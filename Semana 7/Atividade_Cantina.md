@@ -22,7 +22,7 @@
 
 ## 3. Tarefa 02 - Diagrama de Classes
 
-![Diagrama de Classes](imagens/diagrama-classes.png)
+![Diagrama de Classes](imagens/Diagrama_Classes.png)
 
 ## 4. Tarefa 03 - Implementação em Java
 
