@@ -1,0 +1,42 @@
+@startuml
+left to right direction
+
+actor Cliente
+actor Atendente
+actor Gerente
+
+rectangle "Sistema de Vendas da Cantina" {
+    usecase "Consultar Cardápio" as UC1
+    usecase "Escolher Produtos" as UC2
+    usecase "Fechar Pedido" as UC3
+    usecase "Realizar Pagamento" as UC4
+    usecase "Registrar Venda" as UC5
+    usecase "Emitir Comprovante" as UC6
+    usecase "Cadastrar Produto" as UC7
+    usecase "Alterar Preço" as UC8
+    usecase "Atualizar Estoque" as UC9
+    usecase "Remover Produto" as UC10
+    usecase "Consultar Vendas" as UC11
+}
+
+Cliente --> UC1
+Cliente --> UC2
+Cliente --> UC3
+Cliente --> UC4
+
+Atendente --> UC3
+Atendente --> UC4
+Atendente --> UC5
+Atendente --> UC6
+
+Gerente --> UC7
+Gerente --> UC8
+Gerente --> UC9
+Gerente --> UC10
+Gerente --> UC11
+
+UC3 ..> UC2 : <<include>>
+UC5 ..> UC4 : <<include>>
+UC6 ..> UC5 : <<include>>
+
+@enduml
