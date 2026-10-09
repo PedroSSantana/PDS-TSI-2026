@@ -1,0 +1,26 @@
+@startuml
+skinparam object {
+    BackgroundColor White
+    BorderColor #8B4513
+    ArrowColor #A0522D
+}
+
+' Objetos
+object "<u>:Gerente</u>" as gerente
+object "<u>:TelaGerente</u>" as tela
+object "<u>:ControladorProduto</u>" as controle
+object "<u>:Produto</u>" as produto
+
+' Links e mensagens
+gerente -right-> tela : 1: selecionarProduto(codigo) >
+tela -down-> controle : 1.1: localizarProduto(codigo) >
+controle -right-> produto : 1.1.1: consultarProduto() >
+produto -up-> tela : 1.1.2: exibirDadosProduto() >
+gerente -down-> tela : 2: informarNovoPreco(preco) >
+tela -down-> controle : 2.1: alterarPreco(produto, preco) >
+controle -right-> gerente : 2.1.1: alterarPreco(produto, preco) >
+gerente -right-> produto : 2.1.2 [preco >= 0]: atualizarPreco(preco) >
+gerente -left-> tela : 2.2 [preco >= 0]: exibirConfirmacao() >
+controle -down-> tela : 2.3 [preco < 0]: exibirErroPrecoInvalido() >
+
+@enduml
