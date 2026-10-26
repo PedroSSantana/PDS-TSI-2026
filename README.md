@@ -61,3 +61,10 @@ Organização dos objetos e dos caminhos de comunicação para facilitar a leitu
 Transformação das interações representadas em diagramas de sequência em diagramas de comunicação;
 Elaboração dos diagramas de comunicação dos casos de uso executados pelo gerente no sistema de vendas da cantina escolar;
 Organização dos arquivos na pasta semana10 do repositório pessoal do GitHub.
+
+### Semana 11 — Diagramas de Estados ###
+Introdução aos diagramas de estados da UML e ao ciclo de vida dos objetos;
+Representação de estados iniciais, finais e transições;
+Identificação de eventos, gatilhos e condições de guarda;
+Modelagem do comportamento dos objetos e das regras de negócio;
+Utilização do PlantUML para criação e organização de diagramas de estados.
