@@ -1,0 +1,67 @@
+@startuml
+title IFDelivery - Ciclo de Vida do Pedido
+
+hide empty description
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 14
+skinparam ArrowColor #343A40
+skinparam ArrowThickness 1.2
+
+skinparam state {
+  BackgroundColor #F1ECFF
+  BorderColor #805AD5
+  FontColor #202124
+  StartColor #343A40
+  EndColor #343A40
+}
+
+skinparam note {
+  BackgroundColor #FFF8DB
+  BorderColor #D6B656
+  FontColor #202124
+}
+
+state "Aguardando Pagamento" as AguardandoPagamento
+state "Aguardando Restaurante" as AguardandoRestaurante
+state "Em Preparo" as EmPreparo
+state "Pronto para Coleta" as ProntoParaColeta
+state "Em Rota" as EmRota
+state "Entregue" as Entregue
+state "Cancelado" as Cancelado
+
+[*] --> AguardandoPagamento : cliente finaliza carrinho
+
+AguardandoPagamento --> Cancelado : solicitarCancelamento()
+AguardandoPagamento --> AguardandoRestaurante : processarPagamento() [aprovado]
+AguardandoPagamento --> Cancelado : processarPagamento() [recusado]
+
+AguardandoRestaurante --> EmPreparo : aceitarPedido()
+EmPreparo --> ProntoParaColeta : finalizarPreparo()
+ProntoParaColeta --> EmRota : biparPacote()
+EmRota --> Entregue : confirmarEntrega()
+
+Entregue --> [*]
+Cancelado --> [*]
+
+note right of AguardandoPagamento
+  O pedido só avança quando
+  o pagamento é aprovado.
+  Se for recusado, é cancelado.
+end note
+
+note right of EmPreparo
+  A partir deste estado,
+  o cliente não pode cancelar
+  o pedido pelo aplicativo.
+end note
+
+note bottom of Entregue
+  Estado final: pedido concluído.
+end note
+
+note bottom of Cancelado
+  Estado final: pedido cancelado.
+end note
+
+@enduml
