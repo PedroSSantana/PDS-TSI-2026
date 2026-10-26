@@ -1,0 +1,54 @@
+@startuml Entregador
+title IFDelivery — Ciclo de Vida do Entregador
+
+hide empty description
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam roundcorner 14
+skinparam ArrowColor #343A40
+skinparam ArrowThickness 1.2
+skinparam state {
+  BackgroundColor #E8F4FF
+  BorderColor #2878B5
+  FontColor #202124
+  StartColor #343A40
+  EndColor #343A40
+}
+skinparam note {
+  BackgroundColor #FFF8DB
+  BorderColor #D6B656
+  FontColor #202124
+}
+
+[*] --> Offline : abrir app
+
+state "Offline" as Offline
+state "Disponível" as Disponivel
+state "A Caminho do Restaurante" as CaminhoRestaurante
+state "Aguardando Pacote" as AguardandoPacote
+state "Realizando Entrega" as RealizandoEntrega
+
+Offline --> Disponivel : ficarOnline()
+Disponivel --> CaminhoRestaurante : aceitarCorrida()
+CaminhoRestaurante --> AguardandoPacote : confirmarChegada()
+AguardandoPacote --> RealizandoEntrega : iniciarRota()
+
+' Após a entrega, o entregador continua ativo e pode aceitar outra corrida.
+RealizandoEntrega --> Disponivel : finalizarEntrega()
+
+' O estado final só é alcançado quando o entregador está disponível e fica offline.
+Disponivel --> [*] : ficarOffline()
+
+note right of Disponivel
+  O entregador pode:
+  - aceitar uma nova corrida; ou
+  - ficar offline.
+end note
+
+note right of RealizandoEntrega
+  Durante uma entrega,
+  o entregador não está
+  disponível para outra corrida.
+end note
+
+@enduml
