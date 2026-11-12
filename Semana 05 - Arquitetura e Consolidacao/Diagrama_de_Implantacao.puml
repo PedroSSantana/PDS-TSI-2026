@@ -1,0 +1,52 @@
+@startuml
+title FluxPay — Diagrama de Implantação
+top to bottom direction
+skinparam shadowing false
+
+node "Dispositivo do Comerciante" <<device>> as ComerciantePC {
+  artifact "Navegador Web\nPainel FluxPay" as BrowserPainel
+}
+
+node "Dispositivo do Pagador" <<device>> as PagadorPC {
+  artifact "Navegador Web\nCheckout FluxPay" as BrowserCheckout
+}
+
+cloud "Internet" as Internet
+
+node "Ambiente de Aplicação\nServidor / Nuvem" <<node>> as AppServer {
+  artifact "Frontend Web" as Frontend
+  artifact "API REST" as API
+  artifact "Módulo de Autenticação" as Auth
+  artifact "Módulo de Cobranças" as Charges
+  artifact "Módulo de Pagamentos" as Payments
+  artifact "Simulador de Processador" as Simulator
+  artifact "Módulo de Comprovantes" as Receipts
+  artifact "Adaptador de Persistência" as Repository
+}
+
+node "Servidor de Dados" <<node>> as DBServer {
+  database "FluxPayDB\nPostgreSQL" as DB
+}
+
+BrowserPainel --> Internet : HTTPS
+BrowserCheckout --> Internet : HTTPS
+Internet --> Frontend : HTTPS
+Frontend --> API : chamadas REST
+API --> Auth
+API --> Charges
+API --> Payments
+API --> Receipts
+Payments --> Simulator : chamada interna
+Auth --> Repository
+Charges --> Repository
+Payments --> Repository
+Receipts --> Repository
+Repository --> DB : conexão SQL
+
+note right of Simulator
+  O processador é simulado
+  no ambiente da aplicação.
+  Não existe conexão com banco
+  ou adquirente real.
+end note
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+title FluxPay — Ciclo de Vida da Cobrança
+hide empty description
+skinparam shadowing false
+skinparam roundcorner 12
+
+[*] --> Aberta : criarCobranca()
+
+state "Aberta" as Aberta
+state "Paga" as Paga
+state "Cancelada" as Cancelada
+
+Aberta --> Paga : registrarTransacaoAprovada()
+Aberta --> Cancelada : cancelarCobranca()
+
+Paga --> [*]
+Cancelada --> [*]
+
+note right of Aberta
+  Pode receber tentativas de pagamento.
+  Recusa ou pendência não encerram
+  a cobrança.
+end note
+
+note right of Paga
+  Estado alcançado somente após
+  confirmação de transação aprovada.
+end note
+@enduml

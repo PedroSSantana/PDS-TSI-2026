@@ -1,0 +1,40 @@
+@startuml
+title FluxPay — Ciclo de Vida da Transação
+hide empty description
+skinparam shadowing false
+skinparam roundcorner 12
+
+[*] --> Criada : criarTransacao()
+
+state "Criada" as Criada
+state "Em Processamento" as EmProcessamento
+state "Aprovada" as Aprovada
+state "Recusada" as Recusada
+state "Pendente" as Pendente
+state "Falha Técnica" as FalhaTecnica
+
+Criada --> EmProcessamento : enviarSolicitacao()
+EmProcessamento --> Aprovada : retornoAprovado()
+EmProcessamento --> Recusada : retornoRecusado()
+EmProcessamento --> Pendente : retornoPendente()
+EmProcessamento --> FalhaTecnica : simuladorIndisponivel()
+
+Pendente --> Aprovada : confirmarAprovacao()
+Pendente --> Recusada : confirmarRecusa()
+
+Aprovada --> [*]
+Recusada --> [*]
+FalhaTecnica --> [*]
+
+note right of Pendente
+  O resultado ainda não é definitivo.
+  Não gerar comprovante de aprovação
+  enquanto não houver confirmação.
+end note
+
+note bottom of FalhaTecnica
+  Esta tentativa termina com falha.
+  A cobrança pode continuar Aberta,
+  permitindo uma nova tentativa.
+end note
+@enduml
