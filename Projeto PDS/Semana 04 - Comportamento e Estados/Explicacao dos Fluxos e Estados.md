@@ -10,13 +10,13 @@ Os diagramas desta semana mostram como os participantes colaboram para executar 
 
 O comerciante preenche o formulário no Painel Web. O controlador recebe a solicitação e encaminha a operação ao serviço de cobrança. O serviço valida a sessão e os dados, cria a entidade Cobranca, gera identificador e link e solicita a persistência. Somente após a confirmação do repositório o painel apresenta o link.
 
-O fragmento `alt` distingue dados válidos de dados inválidos. Assim, não existe cobrança persistida quando o valor ou a descrição não passam pela validação.
+O primeiro fragmento `alt` distingue dados válidos de dados inválidos. Quando os dados são válidos, o serviço cria a cobrança e solicita sua persistência. Um segundo `alt` diferencia a confirmação do repositório de uma falha ao salvar. O link só é apresentado ao comerciante depois da confirmação; em caso de falha de persistência, o sistema informa o erro e não apresenta a cobrança como criada. Quando os dados são inválidos, nenhuma cobrança é persistida.
 
 ## 3. Diagrama de sequência — Processar pagamento
 
-O pagador abre o link e o checkout solicita os dados da cobrança. Depois da seleção do método de pagamento, o serviço valida se a cobrança está Aberta e cria uma Transacao. A solicitação é encaminhada ao contrato ProcessadorPagamento, implementado nesta atividade pelo simulador.
+O pagador abre o link e o sistema localiza a cobrança. Antes de apresentar o checkout, o serviço verifica se ela existe e permanece Aberta. Se a cobrança estiver ausente, cancelada ou em outro estado, o sistema bloqueia o acesso ao fluxo de pagamento e não cria uma transação. Após a seleção do método, o serviço verifica novamente se a cobrança continua Aberta e valida os dados fictícios. Se a cobrança tiver mudado de estado ou os dados não atenderem aos requisitos mínimos, o processamento é bloqueado antes da criação de uma transação.
 
-O fragmento `alt` apresenta quatro respostas possíveis: aprovada, recusada, pendente e falha técnica. Somente a aprovação altera a cobrança para Paga e permite gerar o comprovante. Recusa, pendência e falha técnica ficam registradas, mas não devem ser exibidas como pagamento concluído.
+Com a cobrança ainda Aberta e os dados válidos, o serviço cria uma Transacao e encaminha a solicitação ao contrato ProcessadorPagamento, implementado nesta atividade pelo simulador. O fragmento `alt` apresenta quatro respostas possíveis: aprovada, recusada, pendente e falha técnica. Somente a aprovação altera a cobrança para Paga e permite gerar o comprovante. Recusa, pendência e falha técnica ficam registradas, mas não devem ser exibidas como pagamento concluído.
 
 ## 4. Diagrama de estados — Cobrança
 

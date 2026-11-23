@@ -24,10 +24,17 @@ alt Dados válidos
   Service -> Cobranca: <<create>> novaCobranca(valor, descricao)
   Cobranca -> Cobranca: gerarLinkCheckout()
   Service -> Repo: salvar(cobranca)
-  Repo --> Service: confirmacaoPersistencia
-  Service --> Controller: cobrancaCriada(cobranca)
-  Controller --> Painel: respostaSucesso(link, identificador)
-  Painel --> Comerciante: exibirLinkParaCompartilhamento()
+  alt Persistência confirmada
+    Repo --> Service: confirmacaoPersistencia
+    Service --> Controller: cobrancaCriada(cobranca)
+    Controller --> Painel: respostaSucesso(link, identificador)
+    Painel --> Comerciante: exibirLinkParaCompartilhamento()
+  else Falha ao salvar
+    Repo --> Service: falhaPersistencia(motivo)
+    Service --> Controller: erroDePersistencia(motivo)
+    Controller --> Painel: respostaErroPersistencia(motivo)
+    Painel --> Comerciante: exibirFalhaSemApresentarLink()
+  end
 else Dados inválidos
   Service --> Controller: erroDeValidacao(motivo)
   Controller --> Painel: respostaErro(motivo)

@@ -45,3 +45,11 @@ Os enumeradores **StatusCobranca**, **StatusTransacao** e **FormaPagamento** lim
 O diagrama diferencia cobrança de transação: a cobrança é a solicitação comercial, enquanto a transação é uma tentativa concreta de pagamento. Assim, uma cobrança recusada pode continuar aberta sem ser confundida com uma cobrança paga.
 
 A classe de simulação não representa uma integração bancária real. Não existe armazenamento de número real de cartão, CVV ou credenciais bancárias. Os dados de pagamento são fictícios e servem apenas para demonstrar a modelagem.
+
+## 7. Justificativa da ausência de herança
+
+A possibilidade de utilizar herança foi avaliada, mas o modelo não apresenta uma relação natural de generalização entre as classes de domínio. **Comerciante**, **Cobranca**, **Transacao** e **Comprovante** representam conceitos diferentes e possuem responsabilidades próprias; não existe uma classe mais geral da qual as demais sejam especializações do tipo “é um”. Criar uma superclasse apenas para agrupar essas entidades acrescentaria complexidade sem reaproveitamento real de atributos ou comportamentos.
+
+As diferenças de meio de pagamento e de situação são representadas por **FormaPagamento**, **StatusCobranca** e **StatusTransacao**, que são enumeradores, pois restringem valores possíveis e não representam famílias de objetos com comportamentos especializados. Da mesma forma, os papéis de comerciante e pagador são atores do sistema e não justificam, por si só, uma hierarquia de classes.
+
+Há, contudo, uma abstração por contrato: **SimuladorProcessador** implementa a interface **ProcessadorPagamento**. Essa relação é uma realização de interface, que permite substituir a implementação do processamento sem introduzir herança entre as classes de domínio. Portanto, a ausência de herança é uma decisão consciente, baseada nas responsabilidades e relações efetivamente identificadas no problema.

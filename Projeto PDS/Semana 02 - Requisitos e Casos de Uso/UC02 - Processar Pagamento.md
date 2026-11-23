@@ -15,7 +15,7 @@
 ## Pós-condições
 
 - Uma transação fica associada à cobrança.
-- O resultado é registrado como **Aprovado**, **Recusado** ou **Pendente**.
+- O resultado é registrado como **Aprovado**, **Recusado**, **Pendente** ou **Falha Técnica**.
 - A cobrança passa para **Paga** somente quando o resultado é aprovado.
 - Para resultado aprovado, um comprovante demonstrativo pode ser visualizado.
 
@@ -32,7 +32,7 @@
 9. O sistema envia a solicitação ao Processador de Pagamentos (Simulador).
 10. O simulador avalia o cenário de teste e retorna um resultado.
 11. O sistema registra o resultado e os dados de retorno.
-12. Se aprovado, o sistema marca a transação como **Aprovada** e a cobrança como **Paga**.
+12. O sistema registra a transação como **Aprovada** e marca a cobrança como **Paga**.
 13. O sistema apresenta a confirmação ao pagador.
 14. O sistema disponibiliza o comprovante demonstrativo.
 
@@ -54,6 +54,11 @@
 1. No passo 2 ou 3, o sistema não encontra a cobrança ou identifica status diferente de Aberta.
 2. O sistema bloqueia a tentativa e apresenta uma mensagem adequada.
 3. Nenhuma transação é processada.
+
+**FA04 — Dados fictícios inválidos**
+1. No passo 8, o sistema identifica que os dados fictícios não atendem aos requisitos mínimos de validação.
+2. O sistema informa o campo que precisa ser corrigido e mantém o checkout disponível.
+3. Nenhuma transação é criada ou enviada ao simulador até a correção dos dados.
 
 **FE01 — Indisponibilidade do simulador**
 1. No passo 9 ou 10, o simulador não responde.

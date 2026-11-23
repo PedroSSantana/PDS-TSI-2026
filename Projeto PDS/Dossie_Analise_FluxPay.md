@@ -104,7 +104,7 @@ Exceções: valor menor ou igual a zero, descrição vazia ou falha de persistê
 Ator principal: Pagador. Ator secundário: Processador de Pagamentos (Simulador).  
 Pré-condições: link correspondente a uma cobrança existente e Aberta.  
 Fluxo resumido: abrir checkout; conferir valor e descrição; escolher Pix ou cartão; informar dados fictícios; confirmar; o sistema cria a transação e a envia ao simulador; registrar a resposta; apresentar o resultado.  
-Alternativas: recusado, pendente ou falha técnica. Nenhuma dessas respostas deve marcar a cobrança como Paga. Somente a aprovação altera a cobrança e permite o comprovante.
+Alternativas: cobrança inexistente, cancelada ou não aberta bloqueia a tentativa; dados fictícios inválidos exigem correção antes de criar uma transação; resultados recusado, pendente ou falha técnica são registrados sem marcar a cobrança como Paga. Somente a aprovação altera a cobrança e permite o comprovante.
 
 **Outros casos de uso:** autenticar-se, consultar cobranças e transações, visualizar detalhes, acessar checkout, validar cobrança, solicitar processamento, registrar resultado, visualizar comprovante e cancelar cobrança.
 
@@ -148,6 +148,12 @@ Alternativas: recusado, pendente ou falha técnica. Nenhuma dessas respostas dev
 
 Os atributos são privados e as operações públicas. Valores monetários usam BigDecimal para evitar imprecisão de ponto flutuante. Identificadores usam UUID e datas/horários usam LocalDateTime. Os enumeradores StatusCobranca, StatusTransacao e FormaPagamento restringem os valores possíveis.
 
+### 5.4 Justificativa da ausência de herança
+
+A possibilidade de utilizar herança foi avaliada, mas o modelo não apresenta uma relação natural de generalização entre as classes de domínio. Comerciante, Cobranca, Transacao e Comprovante representam conceitos diferentes e possuem responsabilidades próprias; não existe uma classe mais geral da qual as demais sejam especializações do tipo “é um”. Criar uma superclasse apenas para agrupar essas entidades acrescentaria complexidade sem reaproveitamento real de atributos ou comportamentos.
+
+As diferenças de meio de pagamento e de situação são representadas por FormaPagamento, StatusCobranca e StatusTransacao, que são enumeradores. Os papéis de comerciante e pagador são atores do sistema e não justificam, por si só, uma hierarquia de classes. SimuladorProcessador implementa a interface ProcessadorPagamento: essa realização de interface permite substituir a implementação do processamento e não representa herança entre classes de domínio. Portanto, a ausência de herança é uma decisão consciente, baseada nas relações efetivamente identificadas no problema.
+
 **Diagrama:** [Fonte PlantUML](Semana%2003%20-%20Estrutura%20e%20Diagrama%20de%20Classes/Diagrama_de_Classes.puml) | [Imagem PNG](Semana%2003%20-%20Estrutura%20e%20Diagrama%20de%20Classes/Diagrama_de_Classes.png)
 
 ![Diagrama de Classes](Semana%2003%20-%20Estrutura%20e%20Diagrama%20de%20Classes/Diagrama_de_Classes.png)  
@@ -163,11 +169,10 @@ Os atributos são privados e as operações públicas. Valores monetários usam 
 2. Informa valor e descrição e confirma.
 3. O controlador valida a sessão com o serviço de autenticação.
 4. O serviço de cobrança valida os dados.
-5. Uma cobrança é criada e recebe identificador e link.
-6. O repositório salva a cobrança.
-7. Após a confirmação da persistência, o painel apresenta o link ao comerciante.
-
-Se os dados forem inválidos ou ocorrer falha ao salvar, o sistema apresenta erro e não afirma que a cobrança foi criada.
+5. Com dados válidos, uma cobrança é criada e recebe identificador e link.
+6. O repositório tenta salvar a cobrança.
+7. Se a persistência for confirmada, o painel apresenta o link ao comerciante.
+8. Se os dados forem inválidos ou ocorrer falha ao salvar, o sistema apresenta a mensagem correspondente e não afirma que a cobrança foi criada nem apresenta o link como válido.
 
 **Diagrama:** [Fonte PlantUML — Criar Cobrança](Semana%2004%20-%20Comportamento%20e%20Estados/Diagrama_Sequencia_Criar_Cobranca.puml) | [Imagem PNG](Semana%2004%20-%20Comportamento%20e%20Estados/Diagrama_Sequencia_Criar_Cobranca.png)
 
@@ -176,14 +181,17 @@ Se os dados forem inválidos ou ocorrer falha ao salvar, o sistema apresenta err
 ### 6.2 Sequência — Processar pagamento
 
 1. O pagador abre o link e o sistema localiza a cobrança.
-2. O checkout apresenta valor e descrição.
-3. O pagador seleciona Pix ou cartão e confirma com dados fictícios.
-4. O sistema confirma que a cobrança está Aberta e cria uma Transacao.
-5. A transação é enviada ao ProcessadorPagamento, implementado pelo simulador.
-6. O sistema registra o resultado retornado.
-7. Se aprovado, atualiza a cobrança para Paga e solicita o comprovante.
-8. Se recusado ou pendente, registra o status sem marcar a cobrança como Paga.
-9. Se ocorrer falha técnica, registra a falha e informa que a tentativa não foi concluída.
+2. Antes de exibir o checkout, o sistema verifica se a cobrança existe e está Aberta. Caso esteja ausente, cancelada ou em outro estado, bloqueia a tentativa e não cria uma transação.
+3. Quando a cobrança está disponível, o checkout apresenta valor e descrição.
+4. O pagador seleciona Pix ou cartão e confirma com dados fictícios.
+5. O serviço revalida se a cobrança continua Aberta.
+6. O serviço valida os dados fictícios de teste.
+7. Se a cobrança continuar Aberta e os dados forem válidos, o sistema cria uma Transacao e a envia ao ProcessadorPagamento, implementado pelo simulador.
+8. O sistema registra o resultado retornado.
+9. Para resultado aprovado, atualiza a cobrança para Paga e solicita o comprovante.
+10. Para resultado recusado ou pendente, registra o status sem marcar a cobrança como Paga.
+11. Se ocorrer falha técnica, registra a falha e informa que a tentativa não foi concluída.
+12. Se a cobrança deixar de estar Aberta ou os dados fictícios forem inválidos, o sistema bloqueia o processamento e informa o motivo, sem criar uma transação.
 
 **Diagrama:** [Fonte PlantUML — Processar Pagamento](Semana%2004%20-%20Comportamento%20e%20Estados/Diagrama_Sequencia_Processar_Pagamento.puml) | [Imagem PNG](Semana%2004%20-%20Comportamento%20e%20Estados/Diagrama_Sequencia_Processar_Pagamento.png)
 

@@ -13,49 +13,74 @@ participant "ComprovanteService" as Comprovantes
 Pagador -> Checkout: abrirLink(link)
 Checkout -> Controller: carregarCheckout(idCobranca)
 Controller -> RepoC: buscarPorId(idCobranca)
-RepoC --> Controller: cobranca
-Controller --> Checkout: dadosDaCobranca(cobranca)
-Checkout --> Pagador: exibirValorEDescricao()
+RepoC --> Controller: cobrancaOuAusencia
+Controller -> Service: verificarDisponibilidadeCheckout(cobranca)
+Service -> Service: validarExistenciaEStatusAberta(cobranca)
 
-Pagador -> Checkout: selecionarMetodoEConfirmar(metodo)
-Checkout -> Controller: pagar(idCobranca, metodo, dadosFicticios)
-Controller -> Service: processarPagamento(cobranca, metodo)
-Service -> Service: validarCobrancaAberta(cobranca)
-Service -> Service: validarDadosDeTeste()
-Service -> RepoT: salvar(novaTransacao)
-RepoT --> Service: transacaoRegistrada
-Service -> Processador: processar(transacao)
+alt Cobrança encontrada e Aberta
+  Service --> Controller: checkoutDisponivel(cobranca)
+  Controller --> Checkout: dadosDaCobranca(cobranca)
+  Checkout --> Pagador: exibirValorEDescricao()
 
-alt Resultado aprovado
-  Processador --> Service: resultado(APROVADA, codigo)
-  Service -> Service: registrarResultado(transacao, resultado)
-  Service -> RepoT: salvar(transacaoAtualizada)
-  Service -> RepoC: salvar(cobrancaAtualizada)
-  Service -> Comprovantes: emitir(transacao)
-  Comprovantes --> Service: comprovante
-  Service --> Controller: pagamentoAprovado(comprovante)
-  Controller --> Checkout: mostrarAprovacao(comprovante)
-  Checkout --> Pagador: exibirConfirmacaoEComprovante()
-else Resultado recusado
-  Processador --> Service: resultado(RECUSADA, codigo)
-  Service -> Service: registrarResultado(transacao, resultado)
-  Service -> RepoT: salvar(transacaoAtualizada)
-  Service --> Controller: pagamentoRecusado()
-  Controller --> Checkout: mostrarRecusa()
-  Checkout --> Pagador: exibirMensagemDeRecusa()
-else Resultado pendente
-  Processador --> Service: resultado(PENDENTE, codigo)
-  Service -> Service: registrarResultado(transacao, resultado)
-  Service -> RepoT: salvar(transacaoAtualizada)
-  Service --> Controller: pagamentoPendente()
-  Controller --> Checkout: mostrarPendencia()
-  Checkout --> Pagador: exibirStatusEmProcessamento()
-else Falha técnica
-  Processador --> Service: indisponibilidade()
-  Service -> Service: registrarResultado(transacao, FALHA_TECNICA)
-  Service -> RepoT: salvar(transacaoAtualizada)
-  Service --> Controller: erroDeProcessamento()
-  Controller --> Checkout: mostrarFalhaTemporaria()
-  Checkout --> Pagador: exibirOrientacaoParaNovaTentativa()
+  Pagador -> Checkout: selecionarMetodoEConfirmar(metodo)
+  Checkout -> Controller: pagar(idCobranca, metodo, dadosFicticios)
+  Controller -> Service: processarPagamento(cobranca, metodo)
+
+  Service -> Service: revalidarCobrancaAberta(cobranca)
+
+  alt Cobrança ainda Aberta
+    Service -> Service: validarDadosDeTeste()
+
+    alt Dados fictícios válidos
+      Service -> RepoT: salvar(novaTransacao)
+      RepoT --> Service: transacaoRegistrada
+      Service -> Processador: processar(transacao)
+
+      alt Resultado aprovado
+        Processador --> Service: resultado(APROVADA, codigo)
+        Service -> Service: registrarResultado(transacao, resultado)
+        Service -> RepoT: salvar(transacaoAtualizada)
+        Service -> RepoC: salvar(cobrancaAtualizada)
+        Service -> Comprovantes: emitir(transacao)
+        Comprovantes --> Service: comprovante
+        Service --> Controller: pagamentoAprovado(comprovante)
+        Controller --> Checkout: mostrarAprovacao(comprovante)
+        Checkout --> Pagador: exibirConfirmacaoEComprovante()
+      else Resultado recusado
+        Processador --> Service: resultado(RECUSADA, codigo)
+        Service -> Service: registrarResultado(transacao, resultado)
+        Service -> RepoT: salvar(transacaoAtualizada)
+        Service --> Controller: pagamentoRecusado()
+        Controller --> Checkout: mostrarRecusa()
+        Checkout --> Pagador: exibirMensagemDeRecusa()
+      else Resultado pendente
+        Processador --> Service: resultado(PENDENTE, codigo)
+        Service -> Service: registrarResultado(transacao, resultado)
+        Service -> RepoT: salvar(transacaoAtualizada)
+        Service --> Controller: pagamentoPendente()
+        Controller --> Checkout: mostrarPendencia()
+        Checkout --> Pagador: exibirStatusEmProcessamento()
+      else Falha técnica
+        Processador --> Service: indisponibilidade()
+        Service -> Service: registrarResultado(transacao, FALHA_TECNICA)
+        Service -> RepoT: salvar(transacaoAtualizada)
+        Service --> Controller: erroDeProcessamento()
+        Controller --> Checkout: mostrarFalhaTemporaria()
+        Checkout --> Pagador: exibirOrientacaoParaNovaTentativa()
+      end
+    else Dados fictícios inválidos
+      Service --> Controller: erroDeValidacao(motivo)
+      Controller --> Checkout: solicitarCorrecaoDosDados(motivo)
+      Checkout --> Pagador: exibirMensagemDeCorrecao()
+    end
+  else Cobrança deixou de estar Aberta
+    Service --> Controller: cobrancaIndisponivel(motivo)
+    Controller --> Checkout: mostrarBloqueioDaTentativa(motivo)
+    Checkout --> Pagador: exibirMensagemDeCobrancaIndisponivel()
+  end
+else Cobrança inexistente, cancelada ou não aberta
+  Service --> Controller: checkoutIndisponivel(motivo)
+  Controller --> Checkout: mostrarErroCheckout(motivo)
+  Checkout --> Pagador: exibirMensagemDeCobrancaIndisponivel()
 end
 @enduml
