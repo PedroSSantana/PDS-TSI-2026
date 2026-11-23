@@ -1,0 +1,36 @@
+@startuml
+title FluxPay — Sequência: Criar Cobrança
+autonumber
+actor Comerciante
+boundary "Painel Web" as Painel
+control "CobrancaController" as Controller
+control "CobrancaService" as Service
+participant "AutenticacaoService" as Auth
+entity "RepositorioCobranca" as Repo
+entity "Cobranca" as Cobranca
+
+Comerciante -> Painel: abrirNovaCobranca()
+Painel --> Comerciante: exibirFormulario()
+Comerciante -> Painel: informarValorEDescricao(valor, descricao)
+Comerciante -> Painel: confirmarCriacao()
+Painel -> Controller: criarCobranca(sessao, valor, descricao)
+Controller -> Auth: validarSessao(sessao)
+Auth --> Controller: comercianteAutenticado
+Controller -> Service: criarCobranca(comerciante, valor, descricao)
+
+Service -> Service: validarDados(valor, descricao)
+
+alt Dados válidos
+  Service -> Cobranca: <<create>> novaCobranca(valor, descricao)
+  Cobranca -> Cobranca: gerarLinkCheckout()
+  Service -> Repo: salvar(cobranca)
+  Repo --> Service: confirmacaoPersistencia
+  Service --> Controller: cobrancaCriada(cobranca)
+  Controller --> Painel: respostaSucesso(link, identificador)
+  Painel --> Comerciante: exibirLinkParaCompartilhamento()
+else Dados inválidos
+  Service --> Controller: erroDeValidacao(motivo)
+  Controller --> Painel: respostaErro(motivo)
+  Painel --> Comerciante: exibirMensagemDeCorrecao()
+end
+@enduml

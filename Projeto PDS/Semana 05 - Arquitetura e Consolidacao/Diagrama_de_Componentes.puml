@@ -1,0 +1,50 @@
+@startuml
+title FluxPay — Diagrama de Componentes
+left to right direction
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "Camada de Apresentação" {
+  component "Painel Web" as Painel
+  component "Checkout Web" as Checkout
+}
+
+package "Camada de Aplicação" {
+  component "API REST" as API
+  component "Autenticação" as Auth
+  component "Serviço de Cobranças" as Cobrancas
+  component "Serviço de Pagamentos" as Pagamentos
+  component "Serviço de Comprovantes" as Comprovantes
+}
+
+package "Camada de Integração" {
+  interface "ProcessadorPagamento" as IProcessador
+  component "Simulador de Processamento" as Simulador
+}
+
+package "Camada de Dados" {
+  component "Adaptador de Persistência" as Persistencia
+  database "Banco de Dados\n(PostgreSQL)" as Banco
+}
+
+Painel --> API : HTTPS / JSON
+Checkout --> API : HTTPS / JSON
+API --> Auth
+API --> Cobrancas
+API --> Pagamentos
+API --> Comprovantes
+
+Pagamentos ..> IProcessador : utiliza
+Simulador ..|> IProcessador : implementa
+
+Auth --> Persistencia
+Cobrancas --> Persistencia
+Pagamentos --> Persistencia
+Comprovantes --> Persistencia
+Persistencia --> Banco : SQL
+
+note bottom of Simulador
+  Respostas controladas para fins didáticos:
+  aprovada, recusada, pendente ou falha.
+end note
+@enduml

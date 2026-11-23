@@ -1,0 +1,158 @@
+@startuml
+title FluxPay — Diagrama de Classes
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty members
+
+class Comerciante {
+  -id: UUID
+  -nome: String
+  -email: String
+  -senhaHash: String
+  -ativo: boolean
+  +estaAtivo(): boolean
+}
+
+class Cobranca {
+  -id: UUID
+  -descricao: String
+  -valor: BigDecimal
+  -criadaEm: LocalDateTime
+  -linkCheckout: String
+  -status: StatusCobranca
+  +validarDados(): boolean
+  +gerarLinkCheckout(): String
+  +marcarComoPaga(): void
+  +cancelar(): void
+}
+
+class Transacao {
+  -id: UUID
+  -valor: BigDecimal
+  -formaPagamento: FormaPagamento
+  -status: StatusTransacao
+  -criadaEm: LocalDateTime
+  -processadaEm: LocalDateTime
+  -codigoRetorno: String
+  -mensagemRetorno: String
+  +iniciarProcessamento(): void
+  +registrarResultado(resultado: ResultadoProcessamento): void
+  +estaAprovada(): boolean
+}
+
+class Comprovante {
+  -id: UUID
+  -codigo: String
+  -emitidoEm: LocalDateTime
+  +gerar(transacao: Transacao): String
+}
+
+class AutenticacaoService {
+  +autenticar(email: String, senha: String): Comerciante
+  +validarSessao(sessao: String): boolean
+}
+
+class CobrancaController {
+  +criarCobranca(sessao: String, valor: BigDecimal, descricao: String): Cobranca
+  +cancelarCobranca(idCobranca: UUID): void
+}
+
+class PagamentoController {
+  +pagar(idCobranca: UUID, forma: FormaPagamento, dadosFicticios: String): Transacao
+}
+
+class ComprovanteService {
+  +emitir(transacao: Transacao): Comprovante
+}
+
+class ResultadoProcessamento {
+  -status: StatusTransacao
+  -codigo: String
+  -mensagem: String
+}
+
+interface ProcessadorPagamento {
+  +processar(transacao: Transacao): ResultadoProcessamento
+}
+
+class SimuladorProcessador {
+  +processar(transacao: Transacao): ResultadoProcessamento
+}
+
+class CobrancaService {
+  +criarCobranca(comerciante: Comerciante, valor: BigDecimal, descricao: String): Cobranca
+  +consultarCobrancas(comerciante: Comerciante): List<Cobranca>
+  +consultarTransacoes(cobranca: Cobranca): List<Transacao>
+  +cancelarCobranca(cobranca: Cobranca): void
+}
+
+class PagamentoService {
+  -processador: ProcessadorPagamento
+  -repositorioCobranca: RepositorioCobranca
+  -repositorioTransacao: RepositorioTransacao
+  +processarPagamento(cobranca: Cobranca, forma: FormaPagamento): Transacao
+}
+
+interface RepositorioCobranca {
+  +salvar(cobranca: Cobranca): void
+  +buscarPorId(id: UUID): Cobranca
+  +listarPorComerciante(idComerciante: UUID): List<Cobranca>
+}
+
+interface RepositorioTransacao {
+  +salvar(transacao: Transacao): void
+  +buscarPorId(id: UUID): Transacao
+  +listarPorCobranca(idCobranca: UUID): List<Transacao>
+}
+
+enum StatusCobranca {
+  ABERTA
+  PAGA
+  CANCELADA
+}
+
+enum StatusTransacao {
+  CRIADA
+  EM_PROCESSAMENTO
+  APROVADA
+  RECUSADA
+  PENDENTE
+  FALHA_TECNICA
+}
+
+enum FormaPagamento {
+  PIX
+  CARTAO
+}
+
+Comerciante "1" -- "0..*" Cobranca : cria
+Cobranca "1" *-- "0..*" Transacao : registra tentativas
+Transacao "1" -- "0..1" Comprovante : gera
+Transacao ..> ResultadoProcessamento : recebe
+SimuladorProcessador ..|> ProcessadorPagamento
+CobrancaController --> CobrancaService
+PagamentoController --> PagamentoService
+CobrancaController --> AutenticacaoService : valida sessão
+PagamentoService --> ProcessadorPagamento : utiliza
+PagamentoService --> ComprovanteService : solicita comprovante
+ComprovanteService --> Comprovante : cria
+PagamentoService --> RepositorioCobranca : atualiza cobrança
+PagamentoService --> RepositorioTransacao : persiste
+CobrancaService --> RepositorioCobranca : persiste
+CobrancaService --> RepositorioTransacao : consulta
+Cobranca --> StatusCobranca
+Transacao --> StatusTransacao
+Transacao --> FormaPagamento
+
+note right of Cobranca
+  Uma cobrança pode possuir
+  várias tentativas de transação.
+  Só uma aprovação altera
+  o status para PAGA.
+end note
+
+note bottom of SimuladorProcessador
+  Resposta inteiramente fictícia.
+  Não se conecta a bancos reais.
+end note
+@enduml
