@@ -69,5 +69,6 @@ Representação de estados iniciais, finais e transições;
 Identificação de eventos, gatilhos e condições de guarda;
 Modelagem do comportamento dos objetos e das regras de negócio;
 Utilização do PlantUML para criação e organização de diagramas de estados.
+
 ========================================================================================================
 
